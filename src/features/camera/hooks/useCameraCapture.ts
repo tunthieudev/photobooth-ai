@@ -7,6 +7,7 @@ import { getComputedFilterCSS, getOverlaySettings } from "@/features/filters/uti
 import { soundEngine } from "../utils/sound";
 import { useEffectsStore, getEffectById, renderAREffectsToCanvas, adjustFaceForCrop } from "@/features/effects";
 import { globalParticleSystem } from "@/features/particles";
+import { useBackgroundStore, renderBackgroundLayer, compositeSegmentedPerson, globalSegmentationPipeline } from "@/features/background";
 import { TrackedFace } from "@/features/face-tracking/types";
 
 export function useCameraCapture(
@@ -90,7 +91,17 @@ export function useCameraCapture(
       ctx.filter = filterCSS;
     }
 
-    ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+    // Draw Video Feed or Background Segmentation Layer (Phase 7)
+    const bgStore = useBackgroundStore.getState();
+    if (bgStore.isEnabled && bgStore.mode !== "none") {
+      renderBackgroundLayer(ctx, video, targetWidth, targetHeight, bgStore, false);
+      const mask = globalSegmentationPipeline.generateFallbackMask(targetWidth, targetHeight);
+      if (mask) {
+        compositeSegmentedPerson(ctx, video, mask, targetWidth, targetHeight, false, bgStore.edgeSoftness);
+      }
+    } else {
+      ctx.drawImage(video, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+    }
     ctx.filter = "none";
 
     // Apply Vignette if filter has vignette

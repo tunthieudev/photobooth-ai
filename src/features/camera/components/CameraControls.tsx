@@ -16,12 +16,14 @@ import {
   ScanFace,
   Wand2,
   PartyPopper,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useCameraStore, AspectRatioType } from "@/stores/useCameraStore";
 import { useBoothStore } from "@/stores/useBoothStore";
 import { useFaceTrackingStore } from "@/features/face-tracking";
 import { useEffectsStore } from "@/features/effects";
 import { useParticleStore } from "@/features/particles";
+import { useBackgroundStore } from "@/features/background";
 import { Button } from "@/components/ui/Button";
 import { Tooltip } from "@/components/ui/Tooltip";
 import { useTranslation } from "@/lib/i18n";
@@ -39,6 +41,8 @@ interface CameraControlsProps {
   isEffectsDrawerOpen?: boolean;
   onToggleParticles?: () => void;
   isParticlesDrawerOpen?: boolean;
+  onToggleBackground?: () => void;
+  isBackgroundDrawerOpen?: boolean;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
 }
@@ -55,6 +59,8 @@ export function CameraControls({
   isEffectsDrawerOpen,
   onToggleParticles,
   isParticlesDrawerOpen,
+  onToggleBackground,
+  isBackgroundDrawerOpen,
   isFullscreen,
   onToggleFullscreen,
 }: CameraControlsProps) {
@@ -75,6 +81,7 @@ export function CameraControls({
   const { isTrackingEnabled } = useFaceTrackingStore();
   const { selectedEffectId } = useEffectsStore();
   const { activePreset } = useParticleStore();
+  const { isEnabled: hasBackground, mode: bgMode } = useBackgroundStore();
   const { t } = useTranslation();
 
   const aspectRatios: AspectRatioType[] = ["3:4", "1:1", "4:3", "9:16", "16:9"];
@@ -145,6 +152,26 @@ export function CameraControls({
             <span>{t.particles?.title || "Particles"}</span>
             {hasParticles && (
               <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+            )}
+          </button>
+        )}
+
+        {/* Background Engine Toggle Button (Phase 7) */}
+        {onToggleBackground && (
+          <button
+            onClick={onToggleBackground}
+            disabled={isCapturing}
+            className={cn(
+              "flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+              isBackgroundDrawerOpen || (hasBackground && bgMode !== "none")
+                ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300 border-emerald-500/30 shadow-sm"
+                : "bg-zinc-100 dark:bg-zinc-950/80 text-zinc-700 dark:text-zinc-300 border-zinc-200 dark:border-zinc-800 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-200 dark:hover:bg-zinc-800"
+            )}
+          >
+            <ImageIcon className="w-3.5 h-3.5 text-emerald-500" />
+            <span>{t.background?.title || "Phông nền"}</span>
+            {hasBackground && bgMode !== "none" && (
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
             )}
           </button>
         )}

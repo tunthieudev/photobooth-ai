@@ -11,6 +11,7 @@ import { Loader2, ScanFace } from "lucide-react";
 import { useFaceTracking, FaceTrackingOverlay } from "@/features/face-tracking";
 import { AREffectsOverlay, useEffectsStore, getEffectById } from "@/features/effects";
 import { ParticleOverlay, useParticleStore, PARTICLE_PRESETS } from "@/features/particles";
+import { BackgroundViewportLayer, useBackgroundStore, PRESET_IMAGES, ANIMATED_PRESETS } from "@/features/background";
 import { TrackedFace } from "@/features/face-tracking/types";
 
 interface CameraViewportProps {
@@ -38,8 +39,11 @@ export function CameraViewport({
   const { activeFilter, filterIntensity } = useBoothStore();
   const { selectedEffectId } = useEffectsStore();
   const { activePreset } = useParticleStore();
+  const { isEnabled: isBgEnabled, mode: bgMode, selectedImageId, selectedAnimatedId, blurLevel } = useBackgroundStore();
   const activeEffect = getEffectById(selectedEffectId);
   const activeParticleItem = PARTICLE_PRESETS.find((p) => p.id === activePreset);
+  const activeBgImage = PRESET_IMAGES.find((p) => p.id === selectedImageId);
+  const activeBgAnim = ANIMATED_PRESETS.find((p) => p.id === selectedAnimatedId);
 
   // Face Tracking Engine (Phase 4)
   const internalFaceTracking = useFaceTracking(videoRef, {
@@ -107,6 +111,9 @@ export function CameraViewport({
           )}
         />
 
+        {/* Background Engine Person Segmentation & Replacement Layer (Phase 7) */}
+        <BackgroundViewportLayer videoRef={videoRef} />
+
         {/* Face Tracking Canvas Overlay (Phase 4) */}
         <FaceTrackingOverlay
           videoRef={videoRef}
@@ -132,7 +139,7 @@ export function CameraViewport({
           showLightLeak={overlaySettings.showLightLeak}
         />
 
-        {/* Active Filter, AR Effect & Particle Pill Badges */}
+        {/* Active Filter, AR Effect, Particle & Background Pill Badges */}
         <div className="absolute top-4 right-4 z-30 flex flex-col items-end gap-1.5 pointer-events-none">
           {activeFilter && activeFilter.id !== "normal" && (
             <div className="px-2.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/20 text-[11px] font-semibold text-brand-300 shadow-md">
@@ -149,6 +156,22 @@ export function CameraViewport({
             <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-950/80 backdrop-blur-md border border-amber-500/40 text-[11px] font-semibold text-amber-200 shadow-md">
               <span>{activeParticleItem.icon}</span>
               <span>{activeParticleItem.nameVi || activeParticleItem.name}</span>
+            </div>
+          )}
+          {isBgEnabled && bgMode !== "none" && (
+            <div className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-950/80 backdrop-blur-md border border-emerald-500/40 text-[11px] font-semibold text-emerald-200 shadow-md">
+              <span>🖼️</span>
+              <span>
+                {bgMode === "blur"
+                  ? `Mờ (${blurLevel})`
+                  : bgMode === "image"
+                  ? activeBgImage?.name || "Cảnh nền"
+                  : bgMode === "animated"
+                  ? activeBgAnim?.name || "Nền động"
+                  : bgMode === "color"
+                  ? "Màu nền"
+                  : "Nền riêng"}
+              </span>
             </div>
           )}
         </div>

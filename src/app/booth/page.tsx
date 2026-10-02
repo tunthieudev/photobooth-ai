@@ -34,6 +34,7 @@ import { FilterSelector } from "@/features/filters";
 import { FaceTrackingControls, useFaceTracking } from "@/features/face-tracking";
 import { EffectSelector } from "@/features/effects";
 import { ParticleSelector } from "@/features/particles";
+import { BackgroundSelector } from "@/features/background";
 import { useBoothStore, BoothStep } from "@/stores/useBoothStore";
 import { useToast } from "@/hooks/useToast";
 import { useTranslation } from "@/lib/i18n";
@@ -44,10 +45,11 @@ export default function BoothPage() {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
-  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(true);
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
   const [isFaceDrawerOpen, setIsFaceDrawerOpen] = useState(false);
   const [isEffectsDrawerOpen, setIsEffectsDrawerOpen] = useState(false);
   const [isParticlesDrawerOpen, setIsParticlesDrawerOpen] = useState(false);
+  const [isBackgroundDrawerOpen, setIsBackgroundDrawerOpen] = useState(false);
 
   const { t } = useTranslation();
 
@@ -296,6 +298,13 @@ export default function BoothPage() {
                     </div>
                   )}
 
+                  {/* Background Engine Reel Dock (Phase 7) */}
+                  {isBackgroundDrawerOpen && (
+                    <div className="w-full animate-in fade-in-50 duration-200">
+                      <BackgroundSelector />
+                    </div>
+                  )}
+
                   {/* Face Tracking Controls Dock */}
                   {isFaceDrawerOpen && (
                     <div className="w-full flex justify-center animate-in fade-in-50 duration-200">
@@ -308,13 +317,55 @@ export default function BoothPage() {
                     onCapture={startBurstCapture}
                     onCancelCapture={cancelCapture}
                     onOpenSettings={() => setIsSettingsOpen(true)}
-                    onToggleFilter={() => setIsFilterDrawerOpen(!isFilterDrawerOpen)}
+                    onToggleFilter={() => {
+                      setIsFilterDrawerOpen(!isFilterDrawerOpen);
+                      if (!isFilterDrawerOpen) {
+                        setIsEffectsDrawerOpen(false);
+                        setIsParticlesDrawerOpen(false);
+                        setIsBackgroundDrawerOpen(false);
+                        setIsFaceDrawerOpen(false);
+                      }
+                    }}
                     isFilterDrawerOpen={isFilterDrawerOpen}
-                    onToggleEffects={() => setIsEffectsDrawerOpen(!isEffectsDrawerOpen)}
+                    onToggleEffects={() => {
+                      setIsEffectsDrawerOpen(!isEffectsDrawerOpen);
+                      if (!isEffectsDrawerOpen) {
+                        setIsFilterDrawerOpen(false);
+                        setIsParticlesDrawerOpen(false);
+                        setIsBackgroundDrawerOpen(false);
+                        setIsFaceDrawerOpen(false);
+                      }
+                    }}
                     isEffectsDrawerOpen={isEffectsDrawerOpen}
-                    onToggleParticles={() => setIsParticlesDrawerOpen(!isParticlesDrawerOpen)}
+                    onToggleParticles={() => {
+                      setIsParticlesDrawerOpen(!isParticlesDrawerOpen);
+                      if (!isParticlesDrawerOpen) {
+                        setIsFilterDrawerOpen(false);
+                        setIsEffectsDrawerOpen(false);
+                        setIsBackgroundDrawerOpen(false);
+                        setIsFaceDrawerOpen(false);
+                      }
+                    }}
                     isParticlesDrawerOpen={isParticlesDrawerOpen}
-                    onToggleFaceTracking={() => setIsFaceDrawerOpen(!isFaceDrawerOpen)}
+                    onToggleBackground={() => {
+                      setIsBackgroundDrawerOpen(!isBackgroundDrawerOpen);
+                      if (!isBackgroundDrawerOpen) {
+                        setIsFilterDrawerOpen(false);
+                        setIsEffectsDrawerOpen(false);
+                        setIsParticlesDrawerOpen(false);
+                        setIsFaceDrawerOpen(false);
+                      }
+                    }}
+                    isBackgroundDrawerOpen={isBackgroundDrawerOpen}
+                    onToggleFaceTracking={() => {
+                      setIsFaceDrawerOpen(!isFaceDrawerOpen);
+                      if (!isFaceDrawerOpen) {
+                        setIsFilterDrawerOpen(false);
+                        setIsEffectsDrawerOpen(false);
+                        setIsParticlesDrawerOpen(false);
+                        setIsBackgroundDrawerOpen(false);
+                      }
+                    }}
                     isFaceDrawerOpen={isFaceDrawerOpen}
                     isFullscreen={isFullscreen}
                     onToggleFullscreen={toggleFullscreen}

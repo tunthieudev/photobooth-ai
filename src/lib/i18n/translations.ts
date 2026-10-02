@@ -181,6 +181,17 @@ export const translations = {
       clear: "Tắt hạt rơi",
       none: "Không hạt",
     },
+    background: {
+      title: "Phông nền",
+      engineTitle: "Bộ tách & thay đổi phông nền AI",
+      blur: "Làm mờ nền",
+      colors: "Màu sắc & Gradient",
+      presets: "Cảnh đẹp (10)",
+      animated: "Nền động (6)",
+      custom: "Tải ảnh nền",
+      edgeSoftness: "Độ mềm viền cắt",
+      disable: "Tắt phông nền",
+    },
   },
   en: {
     // Header & Navigation
@@ -361,6 +372,17 @@ export const translations = {
       },
       clear: "Clear particles",
       none: "None",
+    },
+    background: {
+      title: "Background",
+      engineTitle: "AI Background Engine & Segmentation",
+      blur: "Background Blur",
+      colors: "Colors & Gradients",
+      presets: "Scenic Presets (10)",
+      animated: "Animated (6)",
+      custom: "Upload Background",
+      edgeSoftness: "Edge Softness",
+      disable: "Disable Background",
     },
   },
 };
